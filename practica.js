@@ -1,122 +1,125 @@
 const carrito = document.getElementById("carrito")
 const template = document.getElementById("template")
+const footer = document.getElementById("footer")
+const templateFooter = document.getElementById("templateFooter")
 const fragment = document.createDocumentFragment()
-const btnsBotones = document.querySelectorAll(".card .btn")
 
-const carritoObjeto = [];
+document.addEventListener("click", e => {
+    //console.log(e.target.matches(".card .btn-outline-primary"))
+    if (e.target.matches(".card .btn-outline-primary")) {
+        //console.log("Ejecutar agregar al carro")
+        agregarAlCarrito(e);
+    }
+
+    //console.log(e.target.matches(".list-group-item .btn-success"))
+    if (e.target.matches("#carrito .list-group-item .btn-success")) {
+        btnAumentar(e)
+    }
+
+    if (e.target.matches("#carrito .list-group-item .btn-danger")) {
+        btnDisminuir(e)
+    }
 
 
+
+})
+
+let carritoObjeto = [];
 
 const agregarAlCarrito = (e) => {
-    console.log(e.target.dataset.fruta);
+    // console.log(e.target.dataset.fruta);
 
     const producto = {
 
         titulo: e.target.dataset.fruta,
         id: e.target.dataset.fruta,
         cantidad: 1,
+        precio: parseInt(e.target.dataset.precio),
     };
+    console.log(producto)
+
 
     const indice = carritoObjeto.findIndex((item) => item.id === producto.id)
 
-    console.log(indice);
+    // console.log(indice);
 
     if (indice === -1) {
         carritoObjeto.push(producto)
     } else {
         carritoObjeto[indice].cantidad++
+            // carritoObjeto[indice].precio =
+            //  carritoObjeto[indice].cantidad * producto.precio
+
     }
 
     console.log(carritoObjeto)
 
-    pintarCarrito(carritoObjeto);
-
-
+    pintarCarrito();
 }
 
-const pintarCarrito = (array) => {
+const pintarCarrito = () => {
     carrito.textContent = "";
 
-    array.forEach(item => {
+    carritoObjeto.forEach(item => {
 
-        const clone = template.content.firstElementChild.cloneNode(true);
-        clone.querySelector(".lead").textContent = item.titulo
-        clone.querySelector(".badge").textContent = item.cantidad
+        const clone = template.content.cloneNode(true);
+        clone.querySelector(".text-white .lead").textContent = item.titulo;
+        clone.querySelector(".badge").textContent = item.cantidad;
+        clone.querySelector("div .lead span").textContent = item.precio * item.cantidad;
+
+        clone.querySelector(".btn-danger").dataset.id = item.id;
+        clone.querySelector(".btn-success").dataset.id = item.id;
+
 
         fragment.appendChild(clone)
     })
     carrito.appendChild(fragment)
+
+    pintarFooter();
+};
+
+const pintarFooter = () => {
+
+    console.log("pintar Footer")
+    footer.textContent = ""
+
+    const total = carritoObjeto.reduce(
+        (acc, current) => acc + current.cantidad * current.precio, 0
+    )
+    const clone = templateFooter.content.cloneNode(true);
+    clone.querySelector("span").textContent = total
+    footer.appendChild(clone)
 }
 
-btnsBotones.forEach((btn) => btn.addEventListener("click", agregarAlCarrito));
-
-//const frutas = ["🍌", "🍏", "🍓"];
-
-// const nuevoArray = frutas.map((fruta) => fruta); // este no modifica el array, pero cuando ponemos un push aqui no funciona, aqui se devuelve un nuevo array
-// console.log(nuevoArray);
-
-//const copiaArray = frutas; // ejecuta lo mismo pero modifica el array, en este caso es por referencia podemos empujar otro elemento, mantiene el mismo array y le agrega otro elemento
-
-// frutas.push("🍉");
-// console.log(copiaArray);
-
-// const users = [
-//     { name: "John", age: 34 },
-//     { name: "Amy", age: 20 },
-//     { name: "camperCat", age: 10 },
-// ];
-
-// const names = users.map((user) => user.name) // este array me devuelve solo los nombres, este es un map que no modifica el array!!!
-// console.log(names)
-
-// const numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-// const numerosPorDos = numeros.map((mio) => mio * 2)
-// console.log(numerosPorDos)
-
-//filter() crea un nuevo array con todos los elementos que cumplan la condición implementada por la función dada.
-
-// const users = [
-//     { uid: 1, name: "John", age: 34 },
-//     { uid: 2, name: "Amy", age: 20 },
-//     { uid: 3, name: "camperCat", age: 10 },
-// ];
-
-// const userFiltrado = users.filter((user) => user.uid !== 3); // si es distinnto de 3 filtralo o eliminalo
-
-// console.log(userFiltrado);
-
-//El método find() devuelve el valor del primer elemento del array que cumple la función de prueba proporcionada.
-
-// const amy = users.find((user) => user.uid === 2);
-
-// console.log(amy);
 
 
-//Utilizando destructuring
 
-// const { age } = users.find((user) => user.uid === 2);
-// console.log(age);
+const btnAumentar = (e) => {
+    console.log("me diste click", e.target.dataset.id);
+    carritoObjeto = carritoObjeto.map(item => {
+        if (item.id === e.target.dataset.id) {
+            item.cantidad++
+        }
+        return item
+    })
 
-//El método some() comprueba si al menos un elemento del array cumple con la condición implementada por la función proporcionada.
+    pintarCarrito();
+}
 
-// const existe = users.some((user) => user.uid === 2);
-
-// console.log(existe);
-
-
-// const padre = document.querySelector("border-primary")
-// const hijo = document.querySelector("border-secondary")
-// const nieto = document.querySelector("border-danger")
-
-// padre.addEventListener("click", () => {
-//     console.log("me diste click")
-// })
-
-// hijo.addEventListener("click", () => {
-//     console.log("me diste click")
-// })
-
-// nieto.addEventListener("click", () => {
-//     console.log("me diste click")
-// })
+const btnDisminuir = (e) => {
+    // console.log(e.target.dataset.id);
+    carritoObjeto = carritoObjeto.filter((item) => {
+        // console.log(item);
+        if (item.id === e.target.dataset.id) {
+            if (item.cantidad > 0) {
+                item.cantidad--;
+                // console.log(item);
+                if (item.cantidad === 0) return;
+                return item;
+            }
+        } else {
+            return item;
+        }
+    });
+    pintarCarrito();
+};
