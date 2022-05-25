@@ -1,5 +1,5 @@
 # Ejemplo carrito de compras con objeto y template
-
+aqui hice las pruebas de git hub y githubpages
 ## Todo con finess educativos
 
 Si puedes mejorar el codigo, bienvenido!
